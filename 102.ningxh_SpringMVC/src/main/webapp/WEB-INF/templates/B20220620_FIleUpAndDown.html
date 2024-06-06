@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<a th:href="@{/download}">下载1.jpg</a>
+
+<!--上传文件有两个必须条件,post&enctype="multipart/form-data"   第二个代表使用字节的方式上传文件-->
+<!--为什么要特地声明enctype  因为默认情况下是使用 name=value的方式进行拼接的,所以要特地声明-->
+<form th:action="@{/upload1}" method="post" enctype="multipart/form-data">
+    头像:
+    <input type="file" name="photo">
+    <br>
+    <input type="submit" value="上传">
+
+
+</form>
+
+</body>
+</html>

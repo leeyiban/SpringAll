@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                              http://www.springframework.org/schema/beans/spring-beans.xsd
+                              http://www.springframework.org/schema/context
+                              http://www.springframework.org/schema/context/spring-context.xsd
+                              http://www.springframework.org/schema/tx
+                              http://www.springframework.org/schema/tx/spring-tx.xsd
+"
+>
+    <context:component-scan base-package="org.example.transaction"/>
+    <!--
+       Spring中有一个context名称空间,它可以用来做很多扫描操作
+       其中一个是context:property-placeholder用来扫描加载properties属性配置文件
+
+           location属性就是指定你要加载的properties属性配置文件路径
+               classpath: 表示从类路径下开始查找文件
+               classpath:jdbc.properties 表示从类路径下找jdbc.properteis属性配置文件加载
+   -->
+    <context:property-placeholder location="classpath:jdbcTemplate/jdbctransaction.properties"/>
+
+    <!--
+      使用Spring创建德鲁伊数据库连接池
+  -->
+    <bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+        <property name="username" value="${user}"/>
+        <property name="password" value="${password}"/>
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="initialSize" value="${initialSize}"/>
+        <property name="maxActive" value="${maxActive}"/>
+    </bean>
+
+
+    <!--配置Spring提供的工具类,JdbcTemplate。,它用于执行sql语句-->
+    <bean  class="org.springframework.jdbc.core.JdbcTemplate" id="jdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+     </bean>
+
+
+    <!--配置可执行具名|命名参数的sql的jdbcTemplate 这个地方看不懂了,但是不重要-->
+    <bean id="namedParameterJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate" >
+        <constructor-arg name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- 配置事务管理器
+        步骤:
+            1. 配置事务管理器DataSourceTransactionManager到Spring容器中
+            2. 配置事务的AOP
+            3. 给需要使用事务的方法是添加注解@Transactional
+        -->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          id="transactionManager">
+        <!-- 这里的数据源，一定是我们访问数据库使用的数据源，同一个 -->
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+
+    <!--给需要添加事务的类加上代理
+        配置使用哪个事务管理器
+            transaction-manager="transactionManager"
+            默认情况下。如果事务管理器的id值为transactionManager。则此属性可以省略不配置
+            因为transaction-manager属性的默认值就是：transactionManager
+   tx:annotation-driven标签跟注解@Transactional一起组合使用
+-->
+    <tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>
+
+</beans>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+       http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+<!--本质是基于Spring做的配置文件-->
+<!--扫描组件-->
+    <context:component-scan base-package="org.ezplatform"/>
+
+
+<!--    如果以下条件的话,就会被我们的视图解析器解析,实现页面的跳转-->
+<!--    可以直接复制的-->
+<!--    这下面都是spring的内容-->
+    <!-- 配置Thymeleaf视图解析器 -->
+    <bean id="viewResolver"
+          class="org.thymeleaf.spring5.view.ThymeleafViewResolver">
+<!--        设置优先级-->
+        <property name="order" value="1"/>
+<!--        字符集-->
+        <property name="characterEncoding" value="UTF-8"/>
+<!--        内部有个templateEngine的属性 ,值是一个对象-->
+        <property name="templateEngine">
+            <bean class="org.thymeleaf.spring5.SpringTemplateEngine">
+<!--                为这个内置的属性附上默认值-->
+                <property name="templateResolver">
+                    <bean class="org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver">
+                        <!-- 视图前缀 -->
+                        <property name="prefix" value="/WEB-INF/templates/"/>
+                        <!-- 视图后缀 -->
+                        <property name="suffix" value=".html"/>
+<!--                        模板模型-->
+                        <property name="templateMode" value="HTML5"/>
+<!--                        编码-->
+                        <property name="characterEncoding" value="UTF-8" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+
+
+
+    <mvc:annotation-driven >
+        <!-- 处理响应中文内容乱码!!!
+         视频中这部分没讲, 是我从.md中找的
+         -->
+        <mvc:message-converters>
+            <!-- 处理响应中文内容乱码 -->
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="defaultCharset" value="UTF-8" />
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html</value>
+                        <value>application/json</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+
+    </mvc:annotation-driven>
+
+    <!--开启这个注解才能处理静态资源，例如html、js、css、jpg
+    若只设置该标签，则只能访问静态资源，其他请求则无法访问
+    此时必须设置<mvc:annotation-driven/>解决问题
+
+    为什么要添加这个注解:
+       1. 如果不开启这个注解,那么所有的请求都会被Springmvc去解析,他解析不到静态资源,就会报错
+       2. 添加了这个注解之后,如果Springmvc解析不了,那他就会被当做普通的Servlet去解析,这会就能正常的额访问静态资源了
+
+       这个注解必须配合上面的annotation-driven 注解驱动器来配合使用!
+    -->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+
+
+<!--    只有写了这个,才能将前端传递过来的附件,和控制器中的形参匹配起来
+        必须通过文件解析器的解析才能将文件转换为MultipartFile对象
+-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"></bean>
+
+
+
+
+
+
+</beans>

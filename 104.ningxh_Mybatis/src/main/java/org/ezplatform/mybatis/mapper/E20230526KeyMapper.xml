@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--这个namespace=>命名空间
+    必须是Mapper接口的全类名
+    -->
+<mapper namespace="org.ezplatform.mybatis.mapper.E20230526KeyMapper">
+
+
+    <resultMap id="resultMap2" type="org.ezplatform.mybatis.pojo.Key">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <!--
+        association标签可以用来映射一个子对象
+            一种是通过调用一个查询来得到子对象
+            一种是通过建立查询好的列和子对象的属性来进行映射
+
+            property属性指定要映射哪个子对象
+            select 属性指定要使用哪个查询得到子对象
+            column 表示把结果集中的哪个列做为参数给调用的方法使用.
+        -->
+        <association property="lock" column="lock_id"
+                     select="org.ezplatform.mybatis.mapper.E20230526LockMapper.queryLockById" />
+    </resultMap>
+    <!--    /**
+        * 这里只是简单地把key中的数据查询出来<br/>
+        * 然后当需要用到Lock数据的时候再调用另一个查询去查lock的数据
+        * @param id
+        * @return
+        */
+        public Key queryKeyByIdForSimple(Integer id);-->
+    <select id="queryKeyByIdForSimple" resultMap="resultMap2">
+        select `id`,`name`,`lock_id` from t_key where id = #{id}
+    </select>
+
+</mapper>

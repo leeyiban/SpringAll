@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="org.ezplatform.mybatis.mapper.G20230526MybatisCache">
+
+    <!--    /**
+    * 根据lock的id查询lock信息
+    */
+    public Lock queryLockById(Integer id);-->
+    <select id="queryLockById" resultType="org.ezplatform.mybatis.pojo.Lock">
+        select `id`,`name` from t_lock where id = #{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/util
+                           https://www.springframework.org/schema/util/spring-util.xsd
+                           http://www.springframework.org/schema/mvc
+                           https://www.springframework.org/schema/mvc/spring-mvc.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd"
+>
+    <context:component-scan base-package="org.example.ioc"/>
+    <!-- Bean创建部分的代码都在测试文件夹中,主要的注释也都在测试类中 -->
+
+
+    <!-- 问题：
+    1、FileSystemXmlApplicationContext怎么用?
+    答：跟使用JavaSE的相对路径一样
+    new FileSystemXmlApplicationContext("src/applicationContext.xml");
+
+    2、Bean是在什么时候被创建的?
+    答：在创建ApplicatiocnContext对象时一起创建Bean对象（默认）
+
+    3、果调用getBean多次，会创建几个?
+    答：默认创建同一个
+    -->
+    <bean id="personBean" class="org.example.ioc.pojo.Person" >
+        <property name="id" value="1"/>
+        <property name="name" value="12"/>
+        <property name="age" value="12"/>
+        <property name="phone" value="12222"/>
+    </bean>
+
+
+
+
+
+    <!--
+    bean标签表示配置一个Bean对象
+        class属性表示配置Bean的全类名
+        id 唯一的标识
+-->
+    <bean class="org.example.ioc.pojo.Person" id="p1">
+        <!--
+            property标签给属性配置值
+                name是属性名
+                value是属性值
+        -->
+        <property name="id" value="1"/>
+        <property name="name" value="ioc 的 hello world"/>
+        <property name="age" value="18"/>
+        <property name="phone" value="18610541354"/>
+    </bean>
+
+    <bean class="org.example.ioc.pojo.Person" id="p2">
+        <property name="id" value="2" />
+        <property name="name" value="class类型查找" />
+        <property name="age" value="18" />
+        <property name="phone" value="110" />
+    </bean>
+
+
+
+    <!-- 通过构造器为bean的属性赋值 -->
+    <bean class="org.example.ioc.pojo.Person" id="p3">
+        <!--
+                public Person(Integer id, String name, Integer age, String phone)
+
+                constructor-arg  表示使用有参构造器赋值属性
+                    name    参数名
+                    value   参数值
+        -->
+        <constructor-arg name="id" value="3" />
+        <constructor-arg name="name" value="构造器赋值" />
+        <constructor-arg name="age" value="18" />
+        <constructor-arg name="phone" value="120" />
+    </bean>
+
+
+
+
+    <!-- index属性指定构造器参数的顺序 -->
+    <bean class="org.example.ioc.pojo.Person" id="p4">
+        <!--
+            public Person(Integer id, String name, Integer age, String phone)
+
+                index 属性表示参数的索引顺序.
+                    0表示第一个参数
+                    1表示第二个参数
+                    以此类推广一
+                    n表示n+1个参数
+        -->
+        <constructor-arg index="0" value="4" />
+        <constructor-arg index="1" value="参数顺序" />
+        <constructor-arg index="2" value="18" />
+        <constructor-arg index="3" value="110" />
+    </bean>
+
+
+
+    <!-- 根据构造器参数类型注入选择构造器赋值 -->
+    <bean class="org.example.ioc.pojo.Person" id="p5">
+        <!--
+            public Person(Integer id, String name, Integer age, String phone)
+            public Person(Integer id, String name, String phone, Integer age)
+
+            type属性表示参数的具体类型
+        -->
+        <constructor-arg index="0" value="5" type="java.lang.Integer"/>
+        <constructor-arg index="1" value="type类型" type="java.lang.String" />
+        <constructor-arg index="2" value="110" type="java.lang.Integer" />
+        <constructor-arg index="3" value="120" type="java.lang.String" />
+    </bean>
+
+
+
+
+    <!-- 测试null值的使用 -->
+    <bean class="org.example.ioc.pojo.Person" id="p7">
+        <property name="id" value="7" />
+        <property name="name" value="null值测试" />
+        <property name="phone">
+            <!-- null标签表示null值 -->
+            <null></null>
+        </property>
+    </bean>
+
+
+
+<!--     IOC之子对象的赋值测试 -->
+    <bean id="p8" class="org.example.ioc.pojo.Person">
+        <property name="id" value="8" />
+        <property name="car" ref="car"/>
+    </bean>
+    <bean class="org.example.ioc.pojo.Car" id="car">
+        <property name="type" value="保死杰" />
+        <property name="carNo" value="京A12345" />
+    </bean>
+
+
+
+
+<!-- IOC之List属性的赋值 -->
+    <bean id="p9" class="org.example.ioc.pojo.Person">
+        <property name="id" value="8" />
+        <property name="car" ref="car"/>
+        <property name="list">
+            <list>
+                <value>item1</value>
+                <value>item2</value>
+                <value>item3</value>
+                <value>item4</value>
+                <value>item5</value>
+            </list>
+        </property>
+    </bean>
+
+
+<!-- IOC之Map属性的赋值 -->
+    <bean id="p11" class="org.example.ioc.pojo.Person">
+        <property name="id" value="8" />
+        <property name="car" ref="car"/>
+        <property name="list">
+            <list>
+                <value>item1</value>
+                <value>item2</value>
+                <value>item3</value>
+                <value>item4</value>
+                <value>item5</value>
+            </list>
+        </property>
+        <property name="map">
+            <map>
+                <entry key="key1" value="v1"></entry>
+                <entry key="key2" value="v2"></entry>
+                <entry key="key3" value="v3"></entry>
+            </map>
+        </property>
+    </bean>
+
+
+
+    <!-- IOC之Properties属性的赋值 -->
+    <bean id="p12" class="org.example.ioc.pojo.Person">
+        <property name="id" value="8" />
+        <property name="car" ref="car"/>
+        <property name="list">
+            <list>
+                <value>item1</value>
+                <value>item2</value>
+                <value>item3</value>
+                <value>item4</value>
+                <value>item5</value>
+            </list>
+        </property>
+        <property name="map">
+            <map>
+                <entry key="key1" value="v1"></entry>
+                <entry key="key2" value="v2"></entry>
+                <entry key="key3" value="v3"></entry>
+            </map>
+        </property>
+        <property name="props">
+            <props>
+                <prop key="p1">v1</prop>
+                <prop key="p2">v3</prop>
+                <prop key="p4">v3</prop>
+                <prop key="p5">v5</prop>
+            </props>
+        </property>
+    </bean>
+
+
+
+
+
+
+<!-- IOC之级联属性赋值 -->
+    <bean id="p14" class="org.example.ioc.pojo.Person">
+        <property name="id" value="14" />
+        <property name="car" ref="car" />
+        <!--
+            级联属性赋值
+            前提条件是先给子对象赋值
+        -->
+        <property name="car.carNo" value="京C111111" />
+    </bean>
+
+
+
+
+
+    <!--  IOC之静态工厂方法创建Bean
+        class属性 + factory-method属性   是静态工厂方法创建Bean对象
+    -->
+    <bean class="org.example.ioc.A_factory.A01PersonFactory" id="p15" factory-method="create"/>
+
+
+    <!-- IOC之工厂实例方法创建Bean -->
+    <!-- 配置工厂实例 -->
+    <bean class="org.example.ioc.A_factory.A01PersonFactory" id="personFactory" />
+    <!-- factory-bean属性 + factory-method属性  工厂实例方法创建Bean对象  -->
+    <bean id="p16" factory-bean="personFactory" factory-method="create2" />
+
+
+
+
+
+<!--     IOC之FactoryBean接口方式创建对象
+    步骤如下:
+        1 编写一个类去实现工厂接口
+        2 实现接口方法
+        3 到applicationContext.xml中去配置
+ -->
+    <bean class="org.example.ioc.A_factory.B02PersonFactoryBean" id="p17" />
+
+
+
+
+
+
+
+
+    <!-- IOC之继承Bean配置 -->
+    <bean id="parent" class="org.example.ioc.pojo.Person">
+        <property name="id" value="100" />
+        <property name="name" value="person实例" />
+        <property name="age" value="100" />
+        <property name="phone" value="110" />
+    </bean>
+    <!--
+        parent="parent"指定继承哪些Bean的配置信息
+        通过继承实现bean配置信息的重用
+    -->
+    <bean id="p18" class="org.example.ioc.pojo.Person" parent="parent">
+        <property name="id" value="18" />
+    </bean>
+
+
+
+
+
+    <!-- IOC之Bean配置信息的抽象化
+    通过abstract属性创建一个模板bean
+    -->
+    <!--
+    abstract="true" 表示当前的配置信息,只能用于继承,不能实例化
+-->
+    <bean id="parent1" class="org.example.ioc.pojo.Person" abstract="true">
+        <property name="id" value="100" />
+        <property name="name" value="person实例" />
+        <property name="age" value="100" />
+        <property name="phone" value="110" />
+    </bean>
+    <bean id="p19" class="org.example.ioc.pojo.Person" parent="parent1">
+        <property name="id" value="18" />
+    </bean>
+
+
+
+
+
+
+
+    <!-- IOC之组件创建顺序
+        bean之间的依赖  depends-on 属性
+        默认情况下,Spring容器 | Spring IOC容器 | IOC容器 容器中对象创建的顺序是他们在xml中从上到下的配置顺序
+        depends-on="b" 如果要创建A,就必须先创建B
+    -->
+    <bean class="org.example.ioc.pojo.A" id="a" depends-on="b"/>
+    <bean class="org.example.ioc.pojo.B" id="b" />
+    <bean class="org.example.ioc.pojo.C" id="c" />
+
+
+
+
+    <!--
+            scope 属性决定Bean对象的作用域 一般情况下也只是用这两种了
+        singleton               单例(默认)
+                                1 默认情况下,当Spring容器对象创建的时候,容器中的所有单例的对象也会随着创建.
+                                2 多次调用getBean()方法返回的都同一个对象
+        prototype               多例
+                                1 当Spring容器对象创建的时候,多例的对象不会随之创建.
+                                2 多次调用getBean()方法都会创建一个新对象返回.
+        request                 同一请求下.多次调用getBean()方法返回的同一个对象
+                                applicationContext.getBean("xxx");
+                                底层大概的原理是:
+                                    Object bean = request.getAttribute("xxx");
+                                    if (bean == null) {
+                                        bean = 反射创建对象
+                                        request.setAttribute("xxx",bean);
+                                    }
+                                    return bean;
+        session                 同一会话下.多次调用getBean()方法返回的同一个对象
+                                applicationContext.getBean("xxx");
+                                底层大概的原理是:
+                                    Object bean = session.getAttribute("xxx");
+                                    if (bean == null) {
+                                        bean = 反射创建对象
+                                        session.setAttribute("xxx",bean);
+                                    }
+                                    return bean;
+    -->
+    <bean class="org.example.ioc.pojo.Person" id="p20" scope="prototype">
+    </bean>
+
+
+    <!-- xml方式配置实现自动注入,是指,通过在xml配置文件中以配置的方式.为配置的Bean对象的子对象.自动赋值.
+    autowire 配置自动为子对象赋值
+        no             默认值 ,也就是你不配置,子对象就没值
+
+        byName          是指按子对象的属性名,做为id到Spring容器中查找Bean对象并赋值
+                        1 如果找到就直接赋值
+                        2 如果找不到就null值.
+
+        byType          根据子对象的类型到Spring容器中查找,并赋值
+                        1 找到一个就赋值
+                        2 如果找不到,就null值
+                        3 如果找到多个,就报错
+
+        constructor     按构造器参数进行赋值.
+                        1 先按构造器参数的类型来进行查找并赋值
+                        2 如果找不到,就调用其他构造器
+                        3 如果找到多个,就会再按照参数的名称做为id继续到Spring容器中查找并赋值
+-->
+    <bean class="org.example.ioc.pojo.Person" id="p21" autowire="byName">
+        <property name="id" value="21" />
+    </bean>
+    <bean class="org.example.ioc.pojo.Car" id="car2">
+        <property name="name" value="123"/>
+    </bean>
+
+
+
+
+
+
+    <!-- IOC之Bean的生命周期
+        Person对象添加初始化方法和销毁方法:
+    init-method="init" 配置初始化方法名
+        初始化会在对象创建之后自动调用
+    destroy-method="destory" 配置销毁方法 ( 只对单例有效 )
+        当容器对象关闭的时候,也会销毁容器中的对象,对象的销毁方法也会调用
+     -->
+    <bean id="p22" class="org.example.ioc.pojo.Person" scope="prototype"
+          init-method="init" destroy-method="destory">
+        <property name="id" value="22" />
+    </bean>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--
+     后置处理器,可以在对象创建初始化的前后,对对象做一些扩展,增强,等的操作
+
+        Bean的后置处理使用步骤:
+        1 先编写一个类去实现后置处理器接口
+        2 实现后置处理器的方法
+        3 去容器中配置后置处理器
+-->
+    <bean class="org.example.ioc.C_processor.C03MyBeanPostProcessor" />
+
+
+
+
+
+
+
+</beans>

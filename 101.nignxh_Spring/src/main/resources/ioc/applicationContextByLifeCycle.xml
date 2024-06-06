@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/util
+                           https://www.springframework.org/schema/util/spring-util.xsd
+                           http://www.springframework.org/schema/mvc
+                           https://www.springframework.org/schema/mvc/spring-mvc.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd"
+>
+
+    <!--
+        Spring容器的生命周期
+    -->
+    <context:component-scan base-package="org.example.life"/>
+
+
+
+
+
+    <!-- IOC之Bean的生命周期
+        Person对象添加初始化方法和销毁方法:
+    init-method="init" 配置初始化方法名
+        初始化会在对象创建之后自动调用
+    destroy-method="destory" 配置销毁方法 ( 只对单例有效 )
+        当容器对象关闭的时候,也会销毁容器中的对象,对象的销毁方法也会调用
+     -->
+    <bean id="ClassLiftCycle" class="org.example.life.ClassLiftCycle" scope="singleton"
+          init-method="init" destroy-method="destory">
+        <property name="name" value="22" />
+    </bean>
+
+
+    <!--
+        注册 Bean初始化 的前置方法
+        可以针对id="ClassLiftCycle" class="org.example.life.ClassLiftCycle" scope="singleton"
+          init-method="init" 中init方法进行切点围绕
+    -->
+    <bean id="aop" class="org.example.life.aop.ClassLiftCycleAop"/>
+
+
+
+
+
+
+</beans>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 动态语句学习 -->
+<mapper namespace="org.ezplatform.mybatis.mapper.F20230526DynamicSQL">
+
+
+
+    <!--    /**
+        * 查询跟user的lastName有关的用户,或跟user性别相同的用户<br/>
+        *  拿 user 的lastName属性做模糊查询,做user的sex查询用户
+        */
+        public List<User> queryUsersBySample(User user);-->
+    <select id="queryUsersBySample" resultType="org.ezplatform.mybatis.pojo.User"
+            parameterType="org.ezplatform.mybatis.pojo.User">
+        select
+        id,last_name lastName,sex
+        from t_user
+        <!--where标签( 用<where>标签  而不是where语句 )，\
+            可以帮我们在多个动态语句中，有效的去掉 语句 挂在前面 的多余的and  或 or 之类的多余关键字
+             ,挂在条件查询语句后面的就去不掉了 例如 from XXXX or  \r\n  XXXX or就去不掉 | from XXXX  \r\n  or XXXX or能去掉
+        where语句还可以根据包含的内容是否有值, 有内容就添加where关键字.没内容不添加where关键字-->
+        <where>
+            <!--玩不来这个
+                 trim 可以动态在包含的语句前面和后面添加内容。也可以去掉前面或者后面给定的内容
+                     prefix 前面添加内容
+                     suffix 后面添加内容
+                     suffixOverrides 去掉的后面内容
+                     prefixOverrides 去掉的前面内容
+            <trim suffixOverrides="or" > -->
+            <!--	if语句，可以动态的根据你的值来决定，是否需要动态的修改查询条件,最终产生不同的sql语句.  -->
+            <if test="lastName != null">
+                last_name like concat('%',#{lastName},'%')
+                or
+            </if>
+            <if test="sex == 0 || sex == 1">
+
+                sex = #{sex}
+            </if>
+        </where>
+        <!--  </trim> -->
+    </select>
+
+
+    <!-- 如果lastName值有效,则只用lastName模糊查询 <br>
+    如果lastName值无效,而sex值有效,则只使用sex查询 <br/>
+    如果都无效,则可以使用自定义查询条件
+     -->
+    <select id="queryUsersBySampleChoose" resultType="org.ezplatform.mybatis.pojo.User"
+            parameterType="org.ezplatform.mybatis.pojo.User">
+        select
+        `id`,`last_name` lastName,`sex`
+        from
+        t_user
+        <where>
+            <choose>
+                <when test="lastName!=null">
+                    last_name = #{lastName}
+                </when>
+                <when test="sex==1||sex==2">
+                    or
+                    sex = #{sex}
+                </when>
+                <otherwise>
+                    id = 4
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+
+    <!-- set语句的使用  -->
+    <update id="updateUser" parameterType="org.ezplatform.mybatis.pojo.User">
+        update
+        t_user
+        <set>
+            <if test="lastName != null">
+                `last_name` = #{lastName}
+            </if>
+
+            <if test="sex == 0 || sex == 1">
+                , `sex` = #{sex}
+            </if>
+        </set>
+    </update>
+
+
+    <select id="queryUsersByIds" resultType="org.ezplatform.mybatis.pojo.User">
+        select
+        `id`,`last_name` lastName,`sex`
+        from
+        t_user
+        <where>
+            id in(
+            <!--
+            foreach标签用来做遍历操作
+               collection  是遍历的数据源( 参数名 )
+               item 当前遍历到的数据
+               separator 两个元素之间的分隔符
+               open="("    遍历开始的内容
+               close=")"   遍历结束的内容
+            -->
+            <foreach collection="T123" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </where>
+    </select>
+
+
+
+
+
+
+    <insert id="insertUsers">
+        insert into t_user(`last_name`,`sex`)
+        values
+        <foreach collection="list" item="user" separator=",">
+            (#{user.lastName},#{user.sex})
+        </foreach>
+    </insert>
+
+
+
+
+
+    <select id="queryUserById" resultType="org.ezplatform.mybatis.pojo.User">
+        <include refid="sqlone"></include>
+        from t_user
+        where id = #{id}
+    </select>
+
+    <sql id="sqlone">
+        select id, last_name lastName, sex
+    </sql>
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<!-- mybatis 逆向工程 -->
+<generatorConfiguration>
+    <!--
+        targetRuntime   可以设置生成的版本
+            MyBatis3            豪华版本
+            MyBatis3Simple      CRUD操作
+    -->
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+
+        <!-- 去掉全部的注释 -->
+        <commentGenerator>
+            <property name="suppressAllComments" value="true" />
+        </commentGenerator>
+
+        <!--
+            修改数据库的四个连接属性
+        -->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/book"
+                        userId="root"
+                        password="123456">
+        </jdbcConnection>
+
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+        <!--
+
+        javaModelGenerator:Java模型生成器元素，用于指定生成的实体类的Java文件存放位置和包名等信息；生成javaBean
+                    targetPackage指定生成的包
+                    targetProject指定生成的项目位置
+        -->
+        <javaModelGenerator targetPackage="org.ezplatform.mybatis.nixianggongcheng.pojo"
+                            targetProject=".\Mybatis\src\main\java"><!--targetPackage:Java文件的包名；targetProject:Java文件的存放路径；-->
+            <!-- 是否将Mapper XML文件生成到targetPackage下的子包中，默认为false -->
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+
+        <!--
+            sqlMapGenerator标签是生成mapper.xml配置信息 SQL映射文件生成器元素，用于指定生成的Mapper XML文件的存放位置和包名等信息；
+                    targetPackage指定生成的包
+                    targetProject指定生成的项目位置
+        -->
+        <sqlMapGenerator targetPackage="org.ezplatform.mybatis.nixianggongcheng.mapper"
+                         targetProject=".\Mybatis\src\main\java">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+
+        <!--
+            javaClientGenerator生成mapper接口 :Java客户端生成器元素，用于生成与Mapper XML文件对应的Mapper接口的Java文件；
+          type:  Java客户端类型，支持以下三种：ANNOTATEDMAPPER、XMLMAPPER、MIXEDMAPPER，默认为ANNOTATEDMAPPER；
+                    targetPackage指定生成的包
+                    targetProject指定生成的项目位置
+        -->
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="org.ezplatform.mybatis.nixianggongcheng.mapper"
+                             targetProject=".\Mybatis\src\main\java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+
+        <!--
+            table标签,一个标签一个数据库表
+                tableName是表名
+                domainObjectName生成的类名
+        -->
+        <table tableName="mybatis_nixianggongcheng_t_user" domainObjectName="User" ></table>
+        <table tableName="mybatis_nixianggongcheng_t_book" domainObjectName="Book" ></table>
+
+    </context>
+</generatorConfiguration>

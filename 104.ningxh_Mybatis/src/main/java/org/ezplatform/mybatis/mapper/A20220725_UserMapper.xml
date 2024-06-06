@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--这个namespace=>命名空间
+    必须是Mapper接口的全类名
+    -->
+<mapper namespace="org.ezplatform.mybatis.mapper.A20220725_UserMapper">
+
+    <!-- select 标签代表这个是一个查询语句
+            id就是接口中的方法名
+            parameterType 属性表示参数类型  (可选设置,如果是JavaBean,推荐设置)
+            resuleType包装返回结果-->
+    <select id="queryUserById" resultType="org.ezplatform.mybatis.pojo.User">
+        select id, last_name lastName, sex
+        from t_user
+        where id = #{id}
+    </select>
+
+    <select id="queryUsers" resultType="org.ezplatform.mybatis.pojo.User">
+        select id, last_name lastName, sex
+        from t_user
+    </select>
+
+
+    <!--    获取插入数据后的id  第一种方法-->
+    <!--	public int saveUser(User user);
+            useGeneratedKeys 表示插入数据后返回主键!
+            keyProperty="id" 是指将返回的主键id,注入到参数的哪个属性中
+
+            他还能主动分析对象中的属性,并且和#{}中的名称进行匹配
+            -->
+    <insert id="saveUser" useGeneratedKeys="true" keyProperty="id">
+        insert into t_user (last_name, sex)
+        values (#{lastName}, #{sex})
+    </insert>
+
+
+    <!--    获取插入数据后的id  第二种方法-->
+    <insert id="saveUse2r">
+        <!--    2023-5-25 20:38:41
+                   order属性设置两个语句的执行顺序( selectKey语句的执行顺序 )
+                       BEFORE  先执行selectKey的语句
+                       AFTER   后执行selectKey的语句
+                   keyProperty="id" 是指将返回的主键id值,注入到参数的哪个属性中
+                   resultType="int" 表示返回的是Integer类型
+               -->
+        <selectKey order="AFTER" keyProperty="id" resultType="int">
+            select last_insert_id();
+        </selectKey>
+
+
+        insert into t_user (last_name,sex) values (#{lastName},#{sex})
+    </insert>
+
+
+    <update id="updateUser" parameterType="org.ezplatform.mybatis.pojo.User">
+        update t_user
+        set last_name = #{lastName},
+            sex       = #{sex}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteUserById">
+        delete
+        from t_user
+        where id = #{id};
+
+    </delete>
+
+
+    <!-- Param 标注的参数 可以在sql中用#{name} 来表示注解参数name的值 -->
+    <select id="queryUserByNameAndId" resultType="org.ezplatform.mybatis.pojo.User">
+        <!--   last_name=#{name}  这个 #{name} 中的name 就是
+            queryUserByNameAndId(@Param("name") String lastName, @Param("id") Integer id);
+            的  @Param("name")
+        -->
+        select id ,last_name lastName, sex from t_user where id = #{id} and last_name=#{name}
+
+    </select>
+
+
+    <!-- 传递一个Map对象作为参数
+	 只要保证Map中的key和#{name}中的名称保持一致就可以了 -->
+    <select id="queryUserByMap" resultType="org.ezplatform.mybatis.pojo.User">
+        select id, last_name lastName, sex
+        from t_user
+        where id = #{id}
+          and last_name = #{name}
+    </select>
+
+
+    <!-- 模糊查询
+     	// 模糊查询
+	    //注意!!!
+	    // last_name like '%${name}%'
+	    //这里使用的是 ${}  是$$$$ 不是####  %${name}%!
+
+
+	     #{} 是占位符 ?
+                如果只有一个参数的时候,可以随意填写,推荐写成参数名,提高可读性
+                #{} 一般用于参数的占位符.
+
+          ${} 它的作用是把指定参数的值输出,然后和sql中的内容做字符串拼接操作
+                ${}里可以使用@Param(“xxx”)注解来给参数命名使用.然后在${xxx}中使用
+                ${}一般用在替换表
+
+     -->
+    <select id="queryUserLikeName" resultType="org.ezplatform.mybatis.pojo.User">
+        select id, last_name lastName, sex
+        from t_user
+        where last_name like '%${name}%'
+    </select>
+
+
+    <!-- 亦或者 想使用#{} 那就用concat拼接函数去使用
+     where last_name like concat('%',#{name},'%')
+     -->
+    <select id="queryUserLikeName2" resultType="org.ezplatform.mybatis.pojo.User">
+        select id, last_name lastName, sex
+        from t_user
+        where last_name like concat('%', #{name}, '%')
+    </select>
+
+
+    <!--   懒加载 例如A对象中含有B对象   查询A的时候可以通过配置文件,分成查询两个对象  当B对象没有使用到的时候,开启了懒加载,name查询B的语句就不会执行
+
+      延迟加载在一定程序上可以减少很多没有必要的查询。给数据库服务器提升性能上的优化。
+      要启用延迟加载，需要在mybatis-config.xml配置文件中，添加如下两个全局的settings配置。
+
+             打开延迟加载的开关
+         <setting name="lazyLoadingEnabled" value="true" />
+         将积极加载改为消极加载  按需加载
+             <setting name="aggressiveLazyLoading" value="false"/>
+    -->
+    <select id="queryLockByIdLazy" resultType="org.ezplatform.mybatis.pojo.Lock">
+        select `id`,`name` from t_lock where id = #{id}
+    </select>
+
+
+</mapper>

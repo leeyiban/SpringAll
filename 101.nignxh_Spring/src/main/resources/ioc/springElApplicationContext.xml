@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+<!--
+
+    实验26：[SpEL测试I]在SpEL中使用字面量
+    使用格式：#{数值} 		#{“字符串” || ‘字符串’}
+
+    实验27：[SpEL测试II]在SpEL中引用其他bean
+    使用格式：#{bean的id}
+
+    实验28：[SpEL测试III]在SpEL中引用其他bean的某个属性值
+    使用格式： #{bean.属性名}
+
+    实验29：[SpEL测试IV]在SpEL中调用非静态方法
+    使用格式： #{bean.方法名(参数)}
+
+    实验30：[SpEL测试V]在SpEL中调用静态方法
+    使用格式：#{T(全名类).方法名(参数)}
+
+    实验31：[SpEL测试VI]在SpEL中使用运算符
+    使用格式：#{表达式}
+
+ -->
+    <bean class="org.example.ioc.pojo.Car" id="car">
+        <property name="carNo" value="京B12345" />
+        <property name="name" value="马杀拉的" />
+    </bean>
+
+    <bean class="org.example.ioc.pojo.Person" id="springel">
+        <property name="id" value="#{100}" />
+        <!--        <property name="name" value="#{'SpringEL字符串'}" />-->
+        <property name="car" value="#{car}" />
+        <property name="phone" value="#{car.carNo}" />
+        <!--        <property name="name" value="#{car.noStaticFun()}" />-->
+        <property name="name" value="#{T(com.atguigu.pojo.Car).staticFun()}" />
+        <property name="salary" value="#{30000*12}" />
+    </bean>
+</beans>

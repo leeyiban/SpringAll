@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    <!--web.xml主要是注册Servlet和Filter过滤器和listener监听器
+        而SpirngMVC本质上是基于Servlet的
+        现在请求都统一由前端控制器DispatchServlet来控制
+        -->
+
+    <!-- 1.
+    默认的配置方式
+    如果使用一下的配置去配置的话,那么SpringMVC特有的配置文件,就必须使用特定的地址和文件名称
+    默认位于WEN-INF下,默认名称是<servlet-name>-servlet.xml
+    也就是WEB-INF下 SpringMVC-servlet.xml
+<!-    配置SpringMVC的前端控制器,对浏览器发送的请求进行统一处理->
+    <servlet>
+        <servlet-name>SpringMVC</servlet-name>
+        前端控制器,很重要!!
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SpringMVC</servlet-name>
+<!-        /代表能匹配的请求可以使/login或者.html或.css请求路径
+            但是/不能匹配.jsp请求路径的请求
+            jsp的本质就是一个servlet
+
+            那么问题来了,为什么不匹配.jsp呢?
+            因为jsp本身就是一个特殊的servlet,他不需要我们用Springmvc去特殊处理
+            他有自己的处理方式
+
+            这里如果使用/*就代表处理所有,包括.jsp,但是咱们不用
+
+
+            框架本质就是配置文件+jar包
+            -/>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+-->
+
+
+<!--    2.
+        因为使用Maven去管理,所以配置文件一般是放在resource文件夹下,
+        所以我们推荐使用扩展配置方式,配置配置文件
+        可通过init-param标签设置SpringMVC配置文件的位置和名称,通过load-on-startup标签设置SpringMVC前端控制器
+-->
+    <servlet>
+        <servlet-name>SpringMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+<!--            配置Springmvc配置文件的位置和名称-->
+<!--            初始化参数,伴随着servlet初始化,而初始化
+               == 配置SpringMVC配置文件的位置和名称 ==
+-->
+<!--            这里的context...是在dispatchservlet中已经定义好的,我们直接在这为他复制,那么它就会有相对应的功能-->
+            <param-name>contextConfigLocation</param-name><!-- 固定的 上下文配置路径-->
+<!--            这里能设置两种值一个是位置,一个是名称 所以一定要加上classpath,代表类路径-->
+            <param-value>classpath:springMVC.xml</param-value><!--配置两个参数,路径和名称  classpath指的就是当前类路径,就是java文件夹和resources文件夹-->
+        </init-param>
+        <!--        servlet的生命周期中,初始化,是第一次使用的时候初始化
+                    如果dispatcherServlet也是第一次访问的时候,初始化所有的servlet,会严重影响
+                    所以我们,将她(dispatcherServelt)的初始化时间提前到服务器启动时
+        -->
+<!--        这样设置就不会影响到我们第一次访问的速度,将前端控制器dispatchservlet的初始化时间提前到服务器启动时-->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SpringMVC</servlet-name>
+<!--        这里是/*  代表不拦截jsp文件-->
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--  解决乱码问题,详细原因看A20220228_RequestParam的最后一个方法,已经写注释了-->
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+
+<!--    一下两个参数就是CharacterEncodingFilter类中的两个属性 encoding是编码-->
+        <init-param>
+            <!--        看源码197行,就知道这个参数具体是干什么的了-->
+            <!--        设置响应的编码-->
+            <param-name>forceResponseEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+<!--            这个是写死的  设置请求的url-8编码-->
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+
+
+<!--    Restful风格要用到的过滤器,这个过滤器会将请求参数中的_method  判断当前的post请求时put还是delete请求-->
+<!--    注意此方法必须放在CharacterEncodingFilter后面,因为一旦获取参数在CharacterEncodingFilter之前,那么编码过滤器就不能正确的编译中文了!!!!CharacterEncodingFilter必须在所有的过滤器之前-->
+<!--    文档中的详细解释 注：
+目前为止，SpringMVC中提供了两个过滤器：CharacterEncodingFilter和HiddenHttpMethodFilter
+在web.xml中注册时，必须先注册CharacterEncodingFilter，再注册HiddenHttpMethodFilter
+原因：
+在 CharacterEncodingFilter 中通过 request.setCharacterEncoding(encoding) 方法设置字符集的
+request.setCharacterEncoding(encoding) 方法要求前面不能有任何获取请求参数的操作
+而 HiddenHttpMethodFilter 恰恰有一个获取请求方式的操作
+String paramValue = request.getParameter(this.methodParam);
+-->
+    <filter>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>HiddenHttpMethodFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+</web-app>

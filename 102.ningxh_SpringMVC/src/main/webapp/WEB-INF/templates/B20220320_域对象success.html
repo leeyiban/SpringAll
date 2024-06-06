@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<!--引入thymeleaf!!!!-->
+<html lang="en"
+      xmlns:th="http:/ /www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>测试请求参数</h1>
+</body>
+<!--
+如果想使用request中的数据,那么直接在th: 后面的大括号中写上
+如果想使用session中的数据,那么直接在th: 后面加上session.XXX
+如果想使用servletContext中的数据,那么直接在th: 后面加上application:XXX
+-->
+<p th:text="${test1}"></p>
+<p th:text="${testModelAndView}"></p>
+<p th:text="${testModel}"></p>
+<p th:text="${testMap}"></p>
+<p th:text="${testModelmap}"></p>
+
+</html>

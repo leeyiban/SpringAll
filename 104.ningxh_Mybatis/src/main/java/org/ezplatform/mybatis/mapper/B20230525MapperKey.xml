@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--这个namespace=>命名空间
+    必须是Mapper接口的全类名
+    -->
+<mapper namespace="org.ezplatform.mybatis.mapper.B20230525MapperKey">
+
+    <select id="queryUserMap" resultType="org.ezplatform.mybatis.pojo.User">
+        select id,last_name lastName, sex from t_user
+    </select>
+
+
+</mapper>

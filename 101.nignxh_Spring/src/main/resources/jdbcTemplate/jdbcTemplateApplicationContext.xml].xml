@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                              http://www.springframework.org/schema/beans/spring-beans.xsd
+                              http://www.springframework.org/schema/context
+                              http://www.springframework.org/schema/context/spring-context.xsd"
+>
+
+    <!--
+       Spring中有一个context名称空间,它可以用来做很多扫描操作
+       其中一个是context:property-placeholder用来扫描加载properties属性配置文件
+
+           location属性就是指定你要加载的properties属性配置文件路径
+               classpath: 表示从类路径下开始查找文件
+               classpath:jdbc.properties 表示从类路径下找jdbc.properteis属性配置文件加载
+   -->
+    <context:property-placeholder location="classpath:jdbcTemplate/jdbc.properties"/>
+
+    <!--
+      使用Spring创建德鲁伊数据库连接池
+  -->
+    <bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+        <property name="username" value="${user}"/>
+        <property name="password" value="${password}"/>
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="initialSize" value="${initialSize}"/>
+        <property name="maxActive" value="${maxActive}"/>
+    </bean>
+
+
+    <!--配置Spring提供的工具类,JdbcTemplate。,它用于执行sql语句-->
+    <bean  class="org.springframework.jdbc.core.JdbcTemplate" id="jdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+     </bean>
+
+
+    <!--配置可执行具名|命名参数的sql的jdbcTemplate 这个地方看不懂了,但是不重要-->
+    <bean id="namedParameterJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate" >
+        <constructor-arg name="dataSource" ref="dataSource" />
+    </bean>
+</beans>

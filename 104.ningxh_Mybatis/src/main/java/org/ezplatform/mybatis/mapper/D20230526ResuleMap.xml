@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--这个namespace=>命名空间
+    必须是Mapper接口的全类名
+    -->
+<mapper namespace="org.ezplatform.mybatis.mapper.D20230526ResuleMap">
+
+    <!-- 使用resuleMap的方式进行结果映射 -->
+    <resultMap id="resuMap" type="org.ezplatform.mybatis.pojo.User">
+        <id column="id" property="id"/>   <!--注意  这里的标签是 Id! 不是result-->
+
+        <result column="last_name" property="lastName"/>
+        <result column="sex" property="sex"/>
+    </resultMap>
+
+
+    <!-- <select id="queryUsers" resultType="org.ezplatform.mybatis.pojo.User"> -->
+    <select id="queryUsers" resultMap="resuMap">
+        select id, last_name, sex
+        from t_user
+    </select>
+
+
+    <!-- 一对一示例
+        key和lock
+      type属性表示和哪个javaBean对象做列的映射关系
+     -->
+    <resultMap id="lock" type="org.ezplatform.mybatis.pojo.Key">
+        <id column="id" property="id"/>
+        <result column="keyName" property="name"/>
+        <result column="lock_id" property="lock.id"/>
+        <result column="lockName" property="lock.name"/>
+    </resultMap>
+    <select id="queryKeyById" resultMap="lock">
+        select key1.id,
+               key1.name  keyName,
+               key1.lock_id,
+               lock1.name lockName
+        from t_key key1
+                 right join t_lock lock1
+                            on key1.lock_id = lock1.id
+        where key1.id = #{id};
+
+
+    </select>
+
+
+    <!-- 第二种方式,给Key中的Lock对象起个别名
+        <association /> 嵌套结果集映射配置
+     -->
+    <select id="queryKeyById2" resultMap="lock2">
+        select key1.id,
+               key1.name  keyName,
+               key1.lock_id,
+               lock1.name lockName
+        from t_key key1
+                 right join t_lock lock1
+                            on key1.lock_id = lock1.id
+        where key1.id = #{id};
+    </select>
+
+    <resultMap id="lock2" type="org.ezplatform.mybatis.pojo.Key">
+        <id column="id" property="id"/>
+        <result column="keyName" property="name"/>
+        <!-- <result column="lock_id" property="lock.id"/>
+        <result column="lockName" property="lock.name"/>-->
+
+
+        <!-- 使用association 映射子对象的属性
+            property 设置哪个子对象( 子对象属性名 )
+            javaType 是指定子对象的类型
+         -->
+        <association javaType="org.ezplatform.mybatis.pojo.Lock" property="lock">
+            <result column="lock_id" property="id"/>
+            <result column="lockName" property="name"/>
+        </association>
+    </resultMap>
+
+
+    <!-- 一对多
+     // 一次性,根据id查询出对应班级,以及班级所有学生信息
+            public Clazz queryClazzById(Integer id);
+     -->
+    <select id="queryClazzById" resultMap="resultMap1">
+        select t_clazz.*,
+               t_student.id   stu_id,
+               t_student.name stu_name
+        from t_clazz
+                 left join t_student
+                           on
+                               t_clazz.id = t_student.clazz_id
+        where t_clazz.id = #{id}
+    </select>
+    <resultMap id="resultMap1" type="org.ezplatform.mybatis.pojo.Clazz">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+
+        <!-- 注意一对一使用的是association  一对多使用的是:collection  -->
+        <collection property="studentList" ofType="org.ezplatform.mybatis.pojo.Student">
+            <id column="stu_id" property="id" />
+            <result column="stu_name" property="name" />
+        </collection>
+    </resultMap>
+
+
+
+
+    <!-- 一对多 懒加载
+ // 一次性,根据id查询出对应班级,以及班级所有学生信息
+        public Clazz queryClazzById(Integer id);
+ -->
+    <select id="queryClazzByIdForTwoStep" resultMap="resultMap1Lazy">
+        select t_clazz.*,
+               t_student.id   stu_id,
+               t_student.name stu_name
+        from t_clazz
+                 left join t_student
+                           on
+                               t_clazz.id = t_student.clazz_id
+        where t_clazz.id = #{id}
+    </select>
+
+    <resultMap id="resultMap1Lazy" type="org.ezplatform.mybatis.pojo.Clazz">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+
+        <!-- 注意一对一使用的是association  一对多使用的是:collection  -->
+        <!--
+         collection标签不仅可以把查询回来的结果映射成为一个集合
+         也可以调用一个查询,得到一个集合的结果
+
+         property 是集合的属性名
+         select 属性指定调用哪个查询( 包名+类名+方法名 || 名称空间 + id )
+         column 指定哪个列做为调用方法的参数值
+     -->
+        <collection property="studentList" column="id" select="org.ezplatform.mybatis.mapper.D20230526ResuleMap.queryStudentsByClazzId">
+        </collection>
+    </resultMap>
+
+
+    <select id="queryStudentsByClazzId" resultType="org.ezplatform.mybatis.pojo.Student">
+        select `id`,`name` from t_student where clazz_id = #{clazzid}
+    </select>
+
+
+
+
+
+    <!-- 一对多 懒加载
+   // 一次性,根据id查询出对应班级,以及班级所有学生信息
+          public Clazz queryClazzById(Integer id);
+   -->
+    <select id="queryClazzByIdForTwoStep2" resultMap="resultMap1Lazy2">
+        select `id`,`name` from t_clazz where id = #{id}
+    </select>
+
+    <resultMap id="resultMap1Lazy2" type="org.ezplatform.mybatis.pojo.Clazz">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+
+        <!-- 注意一对一使用的是association  一对多使用的是:collection  -->
+        <!--
+        collection标签不仅可以把查询回来的结果映射成为一个集合
+        也可以调用一个查询,得到一个集合的结果
+
+        property 是集合的属性名
+        select 属性指定调用哪个查询( 包名+类名+方法名 || 名称空间 + id )
+        column 指定哪个列做为调用方法的参数值
+
+
+            /**
+             *  根据班级编号查询,同时对学生姓名做模糊查询
+             */
+            public List<Student> queryStudentsByClazzIdAndLikeName(
+                    @Param("clazzId") Integer clazzId,
+                    @Param("name") String name
+            );
+
+            以上方法需要两个参数.他们在sql语句中刚好是 #{clazzId} 和 #{name}
+
+            多列赋值的格式如下:
+                {clazzId=值,name=值}
+                {clazzId=id,name=name}
+
+    -->
+        <collection property="studentList" column="{clazzId=id,stuname=name}" select="org.ezplatform.mybatis.mapper.D20230526ResuleMap.queryStudentsByClazzId2">
+        </collection>
+    </resultMap>
+
+
+    <select id="queryStudentsByClazzId2" resultType="org.ezplatform.mybatis.pojo.Student">
+        select
+            `id`,`name`
+        from
+            t_student
+        where
+            clazz_id = #{clazzId}
+          and
+            name like concat('%',#{stuname},'%')
+    </select>
+
+</mapper>

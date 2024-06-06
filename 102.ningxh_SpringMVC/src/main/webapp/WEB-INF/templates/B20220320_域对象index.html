@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<!--引入thymeleaf!!!!-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>success</h1>
+</body>
+<!--
+如果想使用request中的数据,那么直接在th: 后面的大括号中写上
+如果想使用session中的数据,那么直接在th: 后面加上session.XXX
+如果想使用servletContext中的数据,那么直接在th: 后面加上application:XXX
+-->
+
+<a th:href="@{/RequestSetAttribute/testRequestByServletApi}" >通过servlet获取域中数据</a>
+<a th:href="@{/RequestSetAttribute/testModelAndView}" >modelandview向request域对象分享数据</a>
+<a th:href="@{/RequestSetAttribute/testModel}" >model向request域对象分享数据</a>
+<a th:href="@{/RequestSetAttribute/testmap}" >map向request域对象分享数据</a>
+<a th:href="@{/RequestSetAttribute/testModelmap}" >modelmap向request域对象分享数据</a>
+
+
+</html>

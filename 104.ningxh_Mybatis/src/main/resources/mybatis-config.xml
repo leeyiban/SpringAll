@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!-- properties都是有固定顺序的,这个properties就必须在configuration 的标签下第一个!-->
+    <!-- 使用xml的方式,实现注册数据库驱动,这事第二种方法-->
+    <properties resource="jdbc.properties"/>
+
+
+
+
+
+    <!-- 延迟加载在一定程序上可以减少很多没有必要的查询。给数据库服务器提升性能上的优化。
+        要启用延迟加载，需要在mybatis-config.xml配置文件中，添加如下两个全局的settings配置。
+    -->
+    <settings>
+        <!-- 打开延迟加载的开关 -->
+        <setting name="lazyLoadingEnabled" value="true" />
+        <!-- 将积极加载改为消极加载  按需加载 -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+
+        <!-- 开启二级缓存 一级缓存默认开启
+        开启方法
+            1、mybatis二级缓存默认不开启，需要到mybatis-config.xml配置文件中，通过settings配置启动
+            2、在Mapper.xml的配置文件中加入 <cache/> 标签表示使用二级缓存。
+            3、需要被二级缓存的对象必须要实现java的序列化接口。
+         -->
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
+
+
+
+
+
+
+    <!--设置连接数据库的环境
+         environments 环境就是连接数据库的信息
+    -->
+    <environments default="development">
+        <!-- environment 是一个数据库连接的环境  id是唯一标识 -->
+        <environment id="development">
+            <!--  transactionManager 表示事务管理,
+                type 属性指定使用哪个事务管理
+                JDBC  由事务管理,有提交和有回滚
+                MANAGED  事务交给容器管理,没有提交,也回滚
+            -->
+            <transactionManager type="JDBC"/>
+            <!-- dataSource type="POOLED" 表示使用数据库连接池
+                UNPOOLED  不适用数据库连接池技术,没需要是哟给你Connection连接对象的时候,在手动创建一个使用,用完就关
+                POOLED  是哟个数据库连接池
+              -->
+            <dataSource type="POOLED">
+                <!-- 使用xml的方式,实现注册数据库驱动,这事第一种方法
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://127.0.0.1:3306/mybatis"/>
+                &lt;!&ndash;注意：如果在建sql表单的时候选了字符集（如utf8），
+                这里的value要改成：value="jdbc:mysql://localhost:3306/mybatis?characterEncoding=utf8"&ndash;&gt;
+                <property name="username" value="root"/>
+                <property name="password" value="123456"/>
+                -->
+
+                <!--还有第二种方法 就是引用properties文件-->
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+
+    </environments>
+
+
+
+
+    <!--
+        Mybatis是把sql语句放到配置文件中,而不写到java类中.
+    -->
+    <!--引入映射文件-->
+    <mappers>
+        <!-- 第一种太繁琐,需要一个一个找文件导入,第二种方式,是导入包, -->
+        <!-- 从类路径下加载mapper.xml配置文件 -->
+        <!-- <mapper resource="org/ezplatform/mybatis/mapper/A20220725_UserMapper.xml"/>
+        <mapper resource="org/ezplatform/mybatis/mapper/B20230525MapperKey.xml"/> -->
+        <!--   第二种方式,导入包
+            mybatis会自动根据指定的包名,加载所有的sql配置文件.
+        -->
+        <package name="org.ezplatform.mybatis.mapper"/>
+    </mappers>
+</configuration>
