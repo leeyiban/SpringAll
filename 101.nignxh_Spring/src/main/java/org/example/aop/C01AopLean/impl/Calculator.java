@@ -1,7 +1,11 @@
 package org.example.aop.C01AopLean.impl;
 
+import org.example.aop.C01AopLean.bean.Info;
 import org.example.aop.C01AopLean.interfaces.Calculate;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author:ningxh
@@ -12,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class Calculator implements Calculate {
     @Override
     public int add(int num1, int num2) {
-        System.out.println("num1,num2 = " + num1 + "," + num2);
+        System.out.println("方法正式执行");
         return num1 + num2;
     }
 
@@ -25,4 +29,16 @@ public class Calculator implements Calculate {
     public int div(int num1, int num2) {
         return num1 / num2;
     }
+
+    @Override
+    public List pushData(String title) {
+        ArrayList<Info> list = new ArrayList<Info>();
+        list.add(new Info(title, "11111"));
+        list.add(new Info(title, "2222"));
+        list.add(new Info(title, "3333"));
+        System.out.println("方法正在执行");
+        return list;
+    }
+
+
 }

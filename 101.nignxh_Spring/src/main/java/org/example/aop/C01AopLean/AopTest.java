@@ -30,4 +30,9 @@ public class AopTest {
     public void test1() {
         calculator.add(100, 100);
     }
+    @Test
+    public void test2() {
+        calculator.pushData("挂机与");
+
+    }
 }
